@@ -29,7 +29,9 @@
     "url": "https://github.com/NewOrbit/NewOrbit.validation-knockout/issues"
   },
   "homepage": "https://github.com/NewOrbit/NewOrbit.validation-knockout#readme",
-  "dependencies": {},
+  "dependencies": {
+    "@types/knockout": "^3.4.40"
+  },
   "devDependencies": {
     "@neworbit/tslint-config": "0.0.5",
     "alsatian": "^1.3.1",
