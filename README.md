@@ -6,7 +6,7 @@ Interface between knockout and [@neworbit/validation](https://github.com/NewOrbi
 
 ```typescript
 import { createValidator } from 
-import { validate } from "@neworbit/validation-knockout";
+import { bindValidation } from "@neworbit/validation-knockout";
 
 const mustBeJames = createValidator<string>(v => v === "James", "Value must be 'James'");
 
@@ -14,7 +14,7 @@ const name = ko.observable<string>();
 const nameErrors = ko.observableArray<string>();
 
 // subscribe to an observable, validate, put errors into an observableArray
-validate<string>(
+bindValidation<string>(
     [ mustBeJames ],
     name,
     nameErrors
@@ -23,10 +23,10 @@ validate<string>(
 
 ## Validation system
 
-By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` parameter in `validate`.
+By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` parameter in `bindValidation`.
 
 ```typescript
-validate<string>([ ], value, errors, yourValidationSystemHere);
+bindValidation<string>([ ], value, errors, yourValidationSystemHere);
 ```
 
 Your validation system must be a function with the following signature:
