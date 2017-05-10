@@ -1,19 +1,22 @@
 /// <reference types="knockout" />
-import { ValidationFunction } from "@neworbit/validation";
+import * as Validation from "@neworbit/validation";
 
 interface Observable<T> extends SettableObservable<T> {
     (): T;
-    subscribe(callback: (newValue: T[]) => void): void;
+    subscribe: (callback: (value: T) => any) => any;
 }
 
 interface SettableObservable<T> {
     (value: T | null): void;
 }
 
-const validate = <T>(
-    validators: Array<ValidationFunction<T>>, 
+type ValidationSystem = <T>(validators: Array<Validation.ValidationFunction<T>>, value: T) => Array<Validation.ValidationResult>;
+
+const bindValidation = <T>(
+    validators: Array<Validation.ValidationFunction<T>>, 
     valueObservable: Observable<T>, 
-    errorObservable: SettableObservable<string>
+    errorObservable: SettableObservable<Array<string>>,
+    validationSystem?: ValidationSystem
 ) => {
 
 };
@@ -21,5 +24,6 @@ const validate = <T>(
 export {
     SettableObservable,
     Observable,
-    validate    
+    ValidationSystem,
+    bindValidation    
 };
