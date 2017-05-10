@@ -34,5 +34,5 @@ Your validation system must be a function with the following signature:
 ```typescript
 type ValidationResult = string | null;
 type ValidationFunction<T> = (value: T) => ValidationResult;
-type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T) => Array<ValidationResult>;
+type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T) => Array<string>;
 ```
