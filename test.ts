@@ -32,7 +32,7 @@ export class ValidationTests {
         // trigger the validation
         value("trigger it");
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any, Any);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
     }
 
     @TestCase("some value")

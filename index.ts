@@ -10,7 +10,7 @@ interface SettableObservable<T> {
     (value: T | null): void;
 }
 
-type ValidationSystem = <T>(validators: Array<Validation.ValidationFunction<T>>, value: T) => Array<Validation.ValidationResult>;
+type ValidationSystem = <T>(validators: Array<Validation.ValidationFunction<T>>, value: T) => Array<string>;
 
 const bindValidation = <T>(
     validators: Array<Validation.ValidationFunction<T>>, 
@@ -18,7 +18,18 @@ const bindValidation = <T>(
     errorObservable: SettableObservable<Array<string>>,
     validationSystem?: ValidationSystem
 ) => {
+    const validate = validationSystem || Validation.validate;
 
+    const doValidation = (value: T) => {
+        const errors = validate(validators, value);
+        errorObservable(errors);
+    };
+    
+    doValidation(valueObservable());
+
+    valueObservable.subscribe(v => {
+        doValidation(v);
+    });
 };
 
 export {
