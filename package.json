@@ -1,0 +1,39 @@
+{
+  "name": "@neworbit/validation-knockout",
+  "version": "0.0.1",
+  "description": "NewOrbit validation for knockout",
+  "main": "index.js",
+  "typings": "index.d.ts",
+  "scripts": {
+    "prepublish": "npm run review && npm run build",
+    "build": "tsc",
+    "lint": "tslint -c tslint.json index.ts test.ts",
+    "test": "npm run build && alsatian \"test/*.test.js\"",
+    "review": "npm run test && npm run lint"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts"
+  ],
+  "keywords": [
+    "validation",
+    "knockout"
+  ],
+  "license": "ISC",
+  "author": "NewOrbit Ltd",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NewOrbit/NewOrbit.validation-knockout.git"
+  },
+  "bugs": {
+    "url": "https://github.com/NewOrbit/NewOrbit.validation-knockout/issues"
+  },
+  "homepage": "https://github.com/NewOrbit/NewOrbit.validation-knockout#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@neworbit/tslint-config": "0.0.5",
+    "alsatian": "^1.3.1",
+    "tslint": "^5.2.0",
+    "typescript": "^2.2.2"
+  }
+}
