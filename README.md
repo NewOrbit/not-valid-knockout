@@ -14,8 +14,9 @@ const name = ko.observable<string>();
 const nameErrors = ko.observableArray<string>();
 
 // subscribe to an observable, validate, put errors into an observableArray
-validate(
+validate<string>(
     [ mustBeJames ],
     name,
     nameErrors
 );
+```
