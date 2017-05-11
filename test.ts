@@ -26,7 +26,7 @@ export class ValidationTests {
     public shouldPassValidatorsToValidationSystem(validators: Array<any>) {
         const value = mockObservable<string>().observable;
         const errors = mockObservable<Array<string>>().observable;
-        
+
         bindValidation(validators, value, errors, validationSystem.validate);
 
         // trigger the validation
@@ -40,7 +40,7 @@ export class ValidationTests {
     public shouldPassValueToValidationSystem(input: string) {
         const value = mockObservable<string>().observable;
         const errors = mockObservable<Array<string>>().observable;
-        
+
         bindValidation([ ], value, errors, validationSystem.validate);
 
         // trigger the validation
@@ -64,7 +64,7 @@ export class ValidationTests {
 
         Expect(errors()).toEqual(providedErrors);
     }
-    
+
     @TestCase(20)
     @TestCase(30)
     public shouldNotValidateInitialValueOnBind(input: number) {

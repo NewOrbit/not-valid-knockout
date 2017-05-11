@@ -1,4 +1,7 @@
 /// <reference types="knockout" />
+
+/* tslint:disable:interface-name callable-types */
+
 import * as Validation from "@neworbit/validation";
 
 interface Observable<T> extends SettableObservable<T> {
@@ -13,8 +16,8 @@ interface SettableObservable<T> {
 type ValidationSystem = <T>(validators: Array<Validation.ValidationFunction<T>>, value: T) => Array<string>;
 
 const bindValidation = <T>(
-    validators: Array<Validation.ValidationFunction<T>>, 
-    valueObservable: Observable<T>, 
+    validators: Array<Validation.ValidationFunction<T>>,
+    valueObservable: Observable<T>,
     errorObservable: SettableObservable<Array<string>>,
     validationSystem?: ValidationSystem
 ) => {
@@ -34,5 +37,5 @@ export {
     SettableObservable,
     Observable,
     ValidationSystem,
-    bindValidation    
+    bindValidation
 };
