@@ -67,13 +67,13 @@ export class ValidationTests {
     
     @TestCase(20)
     @TestCase(30)
-    public shouldValidateInitialValueOnBind(input: number) {
+    public shouldNotValidateInitialValueOnBind(input: number) {
         const value = mockObservable<number>(input).observable;
         const errors = mockObservable<Array<string>>().observable;
 
         bindValidation([ ], value, errors, validationSystem.validate);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, input);
     }
 
 }
