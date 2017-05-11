@@ -24,8 +24,6 @@ const bindValidation = <T>(
         const errors = validate(validators, value);
         errorObservable(errors);
     };
-    
-    doValidation(valueObservable());
 
     valueObservable.subscribe(v => {
         doValidation(v);
