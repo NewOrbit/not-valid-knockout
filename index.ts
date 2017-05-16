@@ -2,7 +2,7 @@
 
 /* tslint:disable:interface-name callable-types */
 
-import * as Validation from "@neworbit/validation";
+import { validate as newOrbitValidate, ValidationFunction, ValidationOptions } from "@neworbit/validation";
 
 interface Observable<T> extends SettableObservable<T> {
     (): T;
@@ -13,18 +13,32 @@ interface SettableObservable<T> {
     (value: T | null): void;
 }
 
-type ValidationSystem = <T>(validators: Array<Validation.ValidationFunction<T>>, value: T) => Array<string>;
+interface BindValidationOptions {
+    validationOptions?: ValidationOptions;
+    validationSystem?: ValidationSystem;
+}
+
+type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T, options?: ValidationOptions) => Array<string>;
+
+const getValidationSystem = (options?: BindValidationOptions) => {
+    if (options && options.validationSystem) {
+        return options.validationSystem;
+    }
+
+    return newOrbitValidate;
+};
 
 const bindValidation = <T>(
-    validators: Array<Validation.ValidationFunction<T>>,
+    validators: Array<ValidationFunction<T>>,
     valueObservable: Observable<T>,
     errorObservable: SettableObservable<Array<string>>,
-    validationSystem?: ValidationSystem
+    options?: BindValidationOptions
 ) => {
-    const validate = validationSystem || Validation.validate;
+    const validate = getValidationSystem(options);
+    const validationOptions = options ? options.validationOptions : undefined;
 
     const doValidation = (value: T) => {
-        const errors = validate(validators, value);
+        const errors = validate(validators, value, validationOptions);
         errorObservable(errors);
     };
 
@@ -37,5 +51,6 @@ export {
     SettableObservable,
     Observable,
     ValidationSystem,
+    BindValidationOptions,
     bindValidation
 };

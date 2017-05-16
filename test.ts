@@ -27,12 +27,14 @@ export class ValidationTests {
         const value = mockObservable<string>().observable;
         const errors = mockObservable<Array<string>>().observable;
 
-        bindValidation(validators, value, errors, validationSystem.validate);
+        bindValidation(validators, value, errors, {
+            validationSystem: validationSystem.validate
+        });
 
         // trigger the validation
         value("trigger it");
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any, Any);
     }
 
     @TestCase("some value")
@@ -41,12 +43,14 @@ export class ValidationTests {
         const value = mockObservable<string>().observable;
         const errors = mockObservable<Array<string>>().observable;
 
-        bindValidation([ ], value, errors, validationSystem.validate);
+        bindValidation([ ], value, errors, {
+            validationSystem: validationSystem.validate
+        });
 
         // trigger the validation
         value(input);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
     }
 
     @TestCase([ "green error", "blue error" ])
@@ -55,7 +59,9 @@ export class ValidationTests {
         const value = mockObservable<string>().observable;
         const errors = mockObservable<Array<string>>().observable;
 
-        bindValidation([ ], value, errors, validationSystem.validate);
+        bindValidation([ ], value, errors, {
+            validationSystem: validationSystem.validate
+        });
 
         this.validateSpy.andReturn(providedErrors);
 
@@ -71,9 +77,24 @@ export class ValidationTests {
         const value = mockObservable<number>(input).observable;
         const errors = mockObservable<Array<string>>().observable;
 
-        bindValidation([ ], value, errors, validationSystem.validate);
+        bindValidation([ ], value, errors, {
+            validationSystem: validationSystem.validate
+        });
 
-        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, input);
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, input, Any);
+    }
+
+    @TestCase({ sequential: true })
+    @TestCase({ sequential: false })
+    public shouldPasOptionsToValidator(options: any) {
+        const value = mockObservable<number>().observable;
+        const errors = mockObservable<Array<string>>().observable;
+
+        bindValidation([ ], value, errors, {
+            validationOptions: options
+        });
+
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, Any, options);
     }
 
 }
