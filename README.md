@@ -23,16 +23,29 @@ bindValidation<string>(
 
 ## Validation system
 
-By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` parameter in `bindValidation`.
+By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` property in the `options` parameter in `bindValidation`.
 
 ```typescript
-bindValidation<string>([ ], value, errors, yourValidationSystemHere);
+bindValidation<string>([ ], value, errors, { validationSystem: yourValidationSystemHere });
 ```
 
 Your validation system must be a function with the following signature:
 
 ```typescript
+interface ValidationOptions {
+    sequential?: boolean;
+}
 type ValidationResult = string | null;
 type ValidationFunction<T> = (value: T) => ValidationResult;
-type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T) => Array<string>;
+type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T, options?: ValidationOptions) => Array<string>;
+```
+
+## Options
+
+You can pass a `ValidationOptions` to your validator by using the `validationOptions` property in the `options` parameter:
+
+```typescript
+const options: ValidationOptions = { sequential: true };
+
+bindValidation<string>([ ], value, errors, { validationOptions: options });
 ```
