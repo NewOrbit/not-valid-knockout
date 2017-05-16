@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/NewOrbit/NewOrbit.validation-knockout#readme",
   "dependencies": {
-    "@neworbit/validation": "0.0.8",
+    "@neworbit/validation": "0.0.9",
     "@types/knockout": "^3.4.40"
   },
   "devDependencies": {
