@@ -18,7 +18,11 @@ interface BindValidationOptions {
     validationSystem?: ValidationSystem;
 }
 
-type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T, options?: ValidationOptions) => Array<string>;
+type ValidationSystem = <T>(
+    validators: Array<ValidationFunction<T>>,
+    value: T,
+    options?: ValidationOptions
+) => Array<string>;
 
 const getValidationSystem = (options?: BindValidationOptions) => {
     if (options && options.validationSystem) {
