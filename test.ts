@@ -86,7 +86,7 @@ export class ValidationTests {
 
     @TestCase({ sequential: true })
     @TestCase({ sequential: false })
-    public shouldPasOptionsToValidator(options: any) {
+    public shouldPassOptionsToValidator(options: any) {
         const value = mockObservable<number>().observable;
         const errors = mockObservable<Array<string>>().observable;
 
