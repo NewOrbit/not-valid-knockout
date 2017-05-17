@@ -97,4 +97,18 @@ export class ValidationTests {
         Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, Any, options);
     }
 
+    @Test()
+    public shouldValidateWhenRevalidateCalled() {
+        const value = mockObservable<number>().observable;
+        const errors = mockObservable<Array<string>>().observable;
+
+        const validationBinding = bindValidation([ ], value, errors, {
+            validationSystem: validationSystem.validate
+        });
+
+        validationBinding.revalidate();
+
+        Expect(validationSystem.validate).toHaveBeenCalled();
+    }
+
 }
