@@ -21,6 +21,10 @@ bindValidation<string>(
 );
 ```
 
+### Revalidation
+
+`bindValidation` returns an object with a `revalidate` method, which you can use to revalidate at will.
+
 ## Validation system
 
 By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` property in the `options` parameter in `bindValidation`.
