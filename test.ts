@@ -97,9 +97,10 @@ export class ValidationTests {
         Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, Any, options);
     }
 
-    @Test()
-    public shouldValidateWhenRevalidateCalled() {
-        const value = mockObservable<number>().observable;
+    @TestCase(5)
+    @TestCase(500)
+    public shouldValidateWithCurrentValueWhenRevalidateCalled(input: number) {
+        const value = mockObservable<number>(input).observable;
         const errors = mockObservable<Array<string>>().observable;
 
         const validationBinding = bindValidation([ ], value, errors, {
@@ -108,7 +109,7 @@ export class ValidationTests {
 
         validationBinding.revalidate();
 
-        Expect(validationSystem.validate).toHaveBeenCalled();
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
     }
 
 }
