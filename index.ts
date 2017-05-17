@@ -49,7 +49,7 @@ const bindValidation = <T>(
     valueObservable.subscribe(v => {
         doValidation(v);
     });
-    
+
     const revalidate = () => {
         const currentValue = valueObservable();
         doValidation(currentValue);
