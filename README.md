@@ -25,12 +25,22 @@ bindValidation<string>(
 
 `bindValidation` returns an object with a `revalidate` method, which you can use to revalidate at will.
 
-## Validation system
+## Options
 
-By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` property in the `options` parameter in `bindValidation`.
+You can pass a `ValidationOptions` to your validator by using the parameter:
 
 ```typescript
-bindValidation<string>([ ], value, errors, { validationSystem: yourValidationSystemHere });
+const options: ValidationOptions = { sequential: true };
+
+bindValidation<string>([ ], value, errors, options);
+```
+
+## Validation system
+
+By default, `@neworbit/validation-knockout` uses `@neworbit/validation` to validate. If you want to use another system, you can use the `validationSystem` parameter in `bindValidation`.
+
+```typescript
+bindValidation<string>([ ], value, errors, options, yourValidationSystemHere );
 ```
 
 Your validation system must be a function with the following signature:
@@ -44,12 +54,3 @@ type ValidationFunction<T> = (value: T) => ValidationResult;
 type ValidationSystem = <T>(validators: Array<ValidationFunction<T>>, value: T, options?: ValidationOptions) => Array<string>;
 ```
 
-## Options
-
-You can pass a `ValidationOptions` to your validator by using the `validationOptions` property in the `options` parameter:
-
-```typescript
-const options: ValidationOptions = { sequential: true };
-
-bindValidation<string>([ ], value, errors, { validationOptions: options });
-```

@@ -6,6 +6,8 @@ const validationSystem: { validate: ValidationSystem } = {
     validate: <T>(validators: Array<any>, value: T) => []
 };
 
+const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
+
 @TestFixture()
 export class ValidationTests {
 
@@ -24,12 +26,10 @@ export class ValidationTests {
     @TestCase([ ])
     @TestCase([ () => "bad" ])
     public shouldPassValidatorsToValidationSystem(validators: Array<any>) {
-        const value = mockObservable<string>().observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<string>();
+        const errors = getMockObservable<Array<string>>();
 
-        bindValidation(validators, value, errors, {
-            validationSystem: validationSystem.validate
-        });
+        bindValidation(validators, value, errors, undefined, validationSystem.validate);
 
         // trigger the validation
         value("trigger it");
@@ -40,12 +40,10 @@ export class ValidationTests {
     @TestCase("some value")
     @TestCase("thierry henry is the best football player of all time")
     public shouldPassValueToValidationSystem(input: string) {
-        const value = mockObservable<string>().observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<string>();
+        const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, {
-            validationSystem: validationSystem.validate
-        });
+        bindValidation([ ], value, errors, undefined, validationSystem.validate);
 
         // trigger the validation
         value(input);
@@ -56,12 +54,10 @@ export class ValidationTests {
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
     public shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
-        const value = mockObservable<string>().observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<string>();
+        const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, {
-            validationSystem: validationSystem.validate
-        });
+        bindValidation([ ], value, errors, undefined, validationSystem.validate);
 
         this.validateSpy.andReturn(providedErrors);
 
@@ -74,12 +70,10 @@ export class ValidationTests {
     @TestCase(20)
     @TestCase(30)
     public shouldNotValidateInitialValueOnBind(input: number) {
-        const value = mockObservable<number>(input).observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<number>();
+        const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, {
-            validationSystem: validationSystem.validate
-        });
+        bindValidation([ ], value, errors, undefined, validationSystem.validate);
 
         Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, input, Any);
     }
@@ -87,12 +81,10 @@ export class ValidationTests {
     @TestCase({ sequential: true })
     @TestCase({ sequential: false })
     public shouldPassOptionsToValidator(options: any) {
-        const value = mockObservable<number>().observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<number>();
+        const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, {
-            validationOptions: options
-        });
+        bindValidation([ ], value, errors, options, validationSystem.validate);
 
         Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, Any, options);
     }
@@ -100,12 +92,10 @@ export class ValidationTests {
     @TestCase(5)
     @TestCase(500)
     public shouldValidateWithCurrentValueWhenRevalidateCalled(input: number) {
-        const value = mockObservable<number>(input).observable;
-        const errors = mockObservable<Array<string>>().observable;
+        const value = getMockObservable<number>(input);
+        const errors = getMockObservable<Array<string>>();
 
-        const validationBinding = bindValidation([ ], value, errors, {
-            validationSystem: validationSystem.validate
-        });
+        const validationBinding = bindValidation([ ], value, errors, undefined, validationSystem.validate);
 
         validationBinding.revalidate();
 
