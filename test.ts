@@ -1,9 +1,9 @@
-import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any } from "alsatian";
+import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
-import { bindValidation, ValidationSystem } from "./index";
+import { bindValidation, ValidateFunction } from "./index";
 
-const validationSystem: { validate: ValidationSystem } = {
-    validate: <T>(validators: Array<any>, value: T) => []
+const validationSystem: { validate: ValidateFunction<any> } = {
+    validate: async <T>(validators: Array<any>, value: T) => await []
 };
 
 const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
@@ -51,9 +51,10 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
     }
 
+    @AsyncTest()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
-    public shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
+    public async shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
@@ -61,10 +62,17 @@ export class ValidationTests {
 
         this.validateSpy.andReturn(providedErrors);
 
+        const promise = new Promise(resolve => {
+            errors.subscribe(v => {
+                Expect(errors()).toEqual(providedErrors);
+                resolve();
+            });
+        });
+
         // trigger the validation
         value("bad!");
 
-        Expect(errors()).toEqual(providedErrors);
+        return promise;
     }
 
     @TestCase(20)
