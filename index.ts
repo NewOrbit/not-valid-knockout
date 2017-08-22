@@ -37,16 +37,9 @@ const bindValidation = <T>(
         doValidation(v);
     });
 
-    const revalidate = () => {
-        const currentValue = valueObservable();
-        doValidation(currentValue);
-    };
-
-    revalidate();
-
-    return {
-        revalidate
-    };
+    // validate initial value
+    const currentValue = valueObservable();
+    doValidation(currentValue);
 };
 
 export {
