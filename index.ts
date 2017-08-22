@@ -11,7 +11,7 @@ import {
 
 interface BindValidationOptions {
     validationOptions?: ValidationOptions;
-    validationSystem?: ValidateFunction<any>;
+    validationSystem?: ValidateFunction;
 }
 
 const bindValidation = <T>(
@@ -19,7 +19,7 @@ const bindValidation = <T>(
     valueObservable: KnockoutObservable<T>,
     errorObservable: KnockoutObservable<Array<string>>,
     options?: ValidationOptions,
-    validationSystem?: ValidateFunction<T>
+    validationSystem?: ValidateFunction
 ) => {
     const validate = validationSystem || newOrbitValidate;
     const validationOptions = options || undefined;

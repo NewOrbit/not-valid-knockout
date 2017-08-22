@@ -1,8 +1,8 @@
-import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest } from "alsatian";
+import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
 import { bindValidation, ValidateFunction } from "./index";
 
-const validationSystem: { validate: ValidateFunction<any> } = {
+const validationSystem: { validate: ValidateFunction } = {
     validate: async <T>(validators: Array<any>, value: T) => await []
 };
 
@@ -51,39 +51,31 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
     }
 
-    @AsyncTest()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
     public async shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
+        this.validateSpy.andReturn(Promise.resolve(providedErrors));
+
         bindValidation([ ], value, errors, undefined, validationSystem.validate);
-
-        this.validateSpy.andReturn(providedErrors);
-
-        const promise = new Promise(resolve => {
-            errors.subscribe(v => {
-                Expect(errors()).toEqual(providedErrors);
-                resolve();
-            });
-        });
 
         // trigger the validation
         value("bad!");
 
-        return promise;
+        Expect(errors()).toEqual(providedErrors);
     }
 
     @TestCase(20)
     @TestCase(30)
-    public shouldNotValidateInitialValueOnBind(input: number) {
-        const value = getMockObservable<number>();
+    public shouldValidateInitialValueOnBind(input: number) {
+        const value = getMockObservable<number>(input);
         const errors = getMockObservable<Array<string>>();
 
         bindValidation([ ], value, errors, undefined, validationSystem.validate);
 
-        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, input, Any);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
     }
 
     @TestCase({ sequential: true })
@@ -94,7 +86,7 @@ export class ValidationTests {
 
         bindValidation([ ], value, errors, options, validationSystem.validate);
 
-        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, Any, options);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, Any, options);
     }
 
     @TestCase(5)
