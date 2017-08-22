@@ -21,10 +21,6 @@ bindValidation<string>(
 );
 ```
 
-### Revalidation
-
-`bindValidation` returns an object with a `revalidate` method, which you can use to revalidate at will.
-
 ## Options
 
 You can pass a `ValidationOptions` to your validator by using the parameter:
