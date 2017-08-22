@@ -1,9 +1,11 @@
+/* tslint:disable:max-line-length */
+
 import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
 import { bindValidation, ValidateFunction } from "./index";
 
 const validationSystem: { validate: ValidateFunction } = {
-    validate: async <T>(validators: Array<any>, value: T) => await []
+    validate: async <T> (validators: Array<any>, value: T) => await []
 };
 
 const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
@@ -88,5 +90,5 @@ export class ValidationTests {
 
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, Any, options);
     }
-    
+
 }

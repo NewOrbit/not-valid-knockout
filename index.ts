@@ -1,6 +1,6 @@
 /// <reference types="knockout" />
 
-/* tslint:disable:interface-name callable-types */
+/* tslint:disable:interface-name callable-types max-line-length */
 
 import {
     validate as newOrbitValidate,
@@ -29,6 +29,8 @@ const bindValidation = <T>(
             const errors = await validate(validators, value, validationOptions);
             errorObservable(errors);
         } catch (ex) {
+            // we need to permit console.log here as it's part of functionality
+            // tslint:disable-next-line:no-console
             console.log(ex);
         }
     };
