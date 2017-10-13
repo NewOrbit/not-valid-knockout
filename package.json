@@ -1,6 +1,6 @@
 {
   "name": "@neworbit/validation-knockout",
-  "version": "1.1.0",
+  "version": "2.0.0",
   "description": "NewOrbit validation for knockout",
   "main": "index.js",
   "typings": "index.d.ts",
@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/NewOrbit/NewOrbit.validation-knockout#readme",
   "dependencies": {
-    "@neworbit/validation": "1.1.0",
+    "@neworbit/validation": "2.0.0",
     "@types/knockout": "^3.4.40"
   },
   "devDependencies": {
