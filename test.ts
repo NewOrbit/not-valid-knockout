@@ -84,4 +84,49 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
+    @AsyncTest()
+    public shouldDebounceValidationsIfTooSoon() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
+
+        // set value immediately and update immediately
+        value(20);
+        value(30);
+
+        return new Promise((resolve, reject) => {
+            // only second should be hit (first debounced)
+            setTimeout(() => {
+                Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, 20);
+                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+            }, 500);
+        });
+    }
+
+    @AsyncTest()
+    public shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
+
+        // set value immediately and update after 200ms
+        value(20);
+
+        setTimeout(() => {
+            value(30);
+        }, 200);
+
+        return new Promise((resolve, reject) => {
+            // both should be hit (spaced apart so no debounce)
+            setTimeout(() => {
+                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 20);
+                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+            }, 500);
+        });
+    }
+
 }
