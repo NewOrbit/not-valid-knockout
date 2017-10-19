@@ -2,7 +2,7 @@
 
 import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
-import { bindValidation, ValidateFunction } from "./index";
+import { createKnockoutWrapper, ValidateFunction } from "./index";
 
 const validationSystem: { validate: ValidateFunction } = {
     validate: async <T> (validators: Array<any>, value: T) => await []
@@ -31,12 +31,13 @@ export class ValidationTests {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation(validators, value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation(validators, value, errors);
 
         // trigger the validation
         value("trigger it");
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any, Any);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
     }
 
     @TestCase("some value")
@@ -45,12 +46,13 @@ export class ValidationTests {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
         // trigger the validation
         value(input);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
     @TestCase([ "green error", "blue error" ])
@@ -61,7 +63,8 @@ export class ValidationTests {
 
         this.validateSpy.andReturn(Promise.resolve(providedErrors));
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
         // trigger the validation
         value("bad!");
@@ -75,20 +78,10 @@ export class ValidationTests {
         const value = getMockObservable<number>(input);
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
-    }
-
-    @TestCase({ sequential: true })
-    @TestCase({ sequential: false })
-    public shouldPassOptionsToValidator(options: any) {
-        const value = getMockObservable<number>();
-        const errors = getMockObservable<Array<string>>();
-
-        bindValidation([ ], value, errors, options, validationSystem.validate);
-
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, Any, options);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
 }

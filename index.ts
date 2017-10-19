@@ -9,24 +9,17 @@ import {
     ValidationOptions
 } from "@neworbit/validation";
 
-interface BindValidationOptions {
-    validationOptions?: ValidationOptions;
-    validationSystem?: ValidateFunction;
-}
-
-const bindValidation = <T>(
-    validators: Array<ValidationFunction<T>>,
-    valueObservable: KnockoutObservable<T>,
-    errorObservable: KnockoutObservable<Array<string>>,
-    options?: ValidationOptions,
-    validationSystem?: ValidateFunction
-) => {
+const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
-    const validationOptions = options || undefined;
 
-    const doValidation = async (value: T) => {
+    const doValidation = async <T>(
+        validators: ValidationFunction<T>[],
+        valueObservable: KnockoutObservable<T>,
+        errorObservable: KnockoutObservable<string[]>
+    ) => {
         try {
-            const errors = await validate(validators, value, validationOptions);
+            const value = valueObservable();
+            const errors = await validate(validators, value);
             errorObservable(errors);
         } catch (ex) {
             // we need to permit console.log here as it's part of functionality
@@ -35,17 +28,33 @@ const bindValidation = <T>(
         }
     };
 
-    valueObservable.subscribe(v => {
-        doValidation(v);
-    });
+    const bindValidation = <T>(
+        validators: ValidationFunction<T>[],
+        valueObservable: KnockoutObservable<T>,
+        errorObservable: KnockoutObservable<string[]>,
+        dependentObservables?: KnockoutObservable<any>[]
+    ) => {
+        const validate = () => doValidation(validators, valueObservable, errorObservable);
+        const subscribeToObservable = (observable: KnockoutObservable<any>) => {
+            observable.subscribe(validate);
+        };
 
-    // validate initial value
-    const currentValue = valueObservable();
-    doValidation(currentValue);
+        subscribeToObservable(valueObservable);
+    
+        if (dependentObservables) {
+            // execute validation on all dependent observables
+            dependentObservables.forEach(subscribeToObservable);
+        }
+    
+        validate();
+    };
+
+    return {
+        bindValidation
+    };
 };
 
 export {
     ValidateFunction,
-    BindValidationOptions,
-    bindValidation
+    createKnockoutWrapper
 };
