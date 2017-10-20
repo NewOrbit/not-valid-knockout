@@ -9,23 +9,17 @@ import {
     ValidationOptions
 } from "@neworbit/validation";
 
+import { Subject } from "rxjs";
+
 const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
 
-    const doValidation = async <T>(
+    const getErrors = async <T>(
         validators: ValidationFunction<T>[],
-        valueObservable: KnockoutObservable<T>,
-        errorObservable: KnockoutObservable<string[]>
+        valueObservable: KnockoutObservable<T>
     ) => {
-        try {
-            const value = valueObservable();
-            const errors = await validate(validators, value);
-            errorObservable(errors);
-        } catch (ex) {
-            // we need to permit console.log here as it's part of functionality
-            // tslint:disable-next-line:no-console
-            console.log(ex);
-        }
+        const value = valueObservable();
+        return await validate(validators, value);
     };
 
     const bindValidation = <T>(
@@ -34,19 +28,18 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         errorObservable: KnockoutObservable<string[]>,
         dependentObservables?: KnockoutObservable<any>[]
     ) => {
-        const validate = () => doValidation(validators, valueObservable, errorObservable);
-        const subscribeToObservable = (observable: KnockoutObservable<any>) => {
-            observable.subscribe(validate);
-        };
 
-        subscribeToObservable(valueObservable);
+        const subject = new Subject();
+
+        subject.debounceTime(150)
+               .switchMap(() => getErrors(validators, valueObservable))
+               .subscribe((errors) => {
+                   errorObservable(errors);
+               });
+
+        valueObservable.subscribe(() => subject.next());
     
-        if (dependentObservables) {
-            // execute validation on all dependent observables
-            dependentObservables.forEach(subscribeToObservable);
-        }
-    
-        validate();
+        subject.next();
     };
 
     return {

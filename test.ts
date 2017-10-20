@@ -10,6 +10,12 @@ const validationSystem: { validate: ValidateFunction } = {
 
 const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
 
+function wait(waitPeriodMilliseconds: number) {
+    return new Promise(resolve => setTimeout(resolve, waitPeriodMilliseconds));
+}
+
+const DEBOUNCE_WAIT_PERIOD = 151;
+
 @TestFixture()
 export class ValidationTests {
 
@@ -25,9 +31,10 @@ export class ValidationTests {
         this.validateSpy.restore();
     }
 
+    @AsyncTest()
     @TestCase([ ])
     @TestCase([ () => "bad" ])
-    public shouldPassValidatorsToValidationSystem(validators: Array<any>) {
+    public async shouldPassValidatorsToValidationSystem(validators: Array<any>) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
@@ -37,12 +44,15 @@ export class ValidationTests {
         // trigger the validation
         value("trigger it");
 
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
         Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
     }
 
+    @AsyncTest()
     @TestCase("some value")
     @TestCase("thierry henry is the best football player of all time")
-    public shouldPassValueToValidationSystem(input: string) {
+    public async shouldPassValueToValidationSystem(input: string) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
@@ -52,9 +62,12 @@ export class ValidationTests {
         // trigger the validation
         value(input);
 
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
+    @AsyncTest()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
     public async shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
@@ -69,23 +82,28 @@ export class ValidationTests {
         // trigger the validation
         value("bad!");
 
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
         Expect(errors()).toEqual(providedErrors);
     }
 
+    @AsyncTest()
     @TestCase(20)
     @TestCase(30)
-    public shouldValidateInitialValueOnBind(input: number) {
+    public async shouldValidateInitialValueOnBind(input: number) {
         const value = getMockObservable<number>(input);
         const errors = getMockObservable<Array<string>>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
 
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
     @AsyncTest()
-    public shouldDebounceValidationsIfTooSoon() {
+    public async shouldDebounceValidationsIfTooSoon() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<Array<string>>();
 
@@ -96,37 +114,33 @@ export class ValidationTests {
         value(20);
         value(30);
 
-        return new Promise((resolve, reject) => {
-            // only second should be hit (first debounced)
-            setTimeout(() => {
-                Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, 20);
-                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
-            }, 500);
-        });
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        // first should not be hit due to debouncing
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
     }
 
     @AsyncTest()
-    public shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
+    public async shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<Array<string>>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
 
-        // set value immediately and update after 200ms
+        // set value immediately and update after 151ms
         value(20);
 
-        setTimeout(() => {
-            value(30);
-        }, 200);
+        await wait(DEBOUNCE_WAIT_PERIOD); // wait until the debounce timeout
 
-        return new Promise((resolve, reject) => {
-            // both should be hit (spaced apart so no debounce)
-            setTimeout(() => {
-                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 20);
-                Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
-            }, 500);
-        });
+        value(30);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        // both should be hit (spaced apart so no debounce)
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
     }
 
 }
