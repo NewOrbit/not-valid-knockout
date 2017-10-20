@@ -182,4 +182,21 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
     }
 
+    @AsyncTest()
+    public async shouldDebounceForDependentObservables() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const dependent = getMockObservable<number>(500);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ dependent ]);
+
+        dependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(1).times;
+    }
+
 }
