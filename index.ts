@@ -9,43 +9,49 @@ import {
     ValidationOptions
 } from "@neworbit/validation";
 
-interface BindValidationOptions {
-    validationOptions?: ValidationOptions;
-    validationSystem?: ValidateFunction;
-}
+import { BehaviorSubject } from "rxjs";
 
-const bindValidation = <T>(
-    validators: Array<ValidationFunction<T>>,
-    valueObservable: KnockoutObservable<T>,
-    errorObservable: KnockoutObservable<Array<string>>,
-    options?: ValidationOptions,
-    validationSystem?: ValidateFunction
-) => {
+const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
-    const validationOptions = options || undefined;
 
-    const doValidation = async (value: T) => {
-        try {
-            const errors = await validate(validators, value, validationOptions);
-            errorObservable(errors);
-        } catch (ex) {
-            // we need to permit console.log here as it's part of functionality
-            // tslint:disable-next-line:no-console
-            console.log(ex);
+    const bindValidation = <T>(
+        validators: ValidationFunction<T>[],
+        valueObservable: KnockoutObservable<T>,
+        errorObservable: KnockoutObservable<string[]>,
+        dependentObservables?: KnockoutObservable<any>[]
+    ) => {
+
+        const triggerValidation = () => {
+            const value = valueObservable();
+            subject.next(value);
+        };
+
+        const subscribeValidationToKnockoutObservable =
+            (observable: KnockoutObservable<any>, subject: BehaviorSubject<any>) => {
+                observable.subscribe(triggerValidation);
+            };
+
+        const initialValue = valueObservable();
+        const subject = new BehaviorSubject<T>(initialValue);
+
+        subject
+            .debounceTime(150)
+            .switchMap(async value => await validate(validators, value))
+            .subscribe(errors => errorObservable(errors));
+
+        subscribeValidationToKnockoutObservable(valueObservable, subject);
+
+        if (dependentObservables) {
+            dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o, subject));
         }
     };
 
-    valueObservable.subscribe(v => {
-        doValidation(v);
-    });
-
-    // validate initial value
-    const currentValue = valueObservable();
-    doValidation(currentValue);
+    return {
+        bindValidation
+    };
 };
 
 export {
     ValidateFunction,
-    BindValidationOptions,
-    bindValidation
+    createKnockoutWrapper
 };

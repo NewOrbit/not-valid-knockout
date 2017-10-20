@@ -2,13 +2,19 @@
 
 import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
-import { bindValidation, ValidateFunction } from "./index";
+import { createKnockoutWrapper, ValidateFunction } from "./index";
 
 const validationSystem: { validate: ValidateFunction } = {
     validate: async <T> (validators: Array<any>, value: T) => await []
 };
 
 const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
+
+function wait(waitPeriodMilliseconds: number) {
+    return new Promise(resolve => setTimeout(resolve, waitPeriodMilliseconds));
+}
+
+const DEBOUNCE_WAIT_PERIOD = 151;
 
 @TestFixture()
 export class ValidationTests {
@@ -25,34 +31,43 @@ export class ValidationTests {
         this.validateSpy.restore();
     }
 
+    @AsyncTest()
     @TestCase([ ])
     @TestCase([ () => "bad" ])
-    public shouldPassValidatorsToValidationSystem(validators: Array<any>) {
+    public async shouldPassValidatorsToValidationSystem(validators: Array<any>) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation(validators, value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation(validators, value, errors);
 
         // trigger the validation
         value("trigger it");
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any, Any);
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
     }
 
+    @AsyncTest()
     @TestCase("some value")
     @TestCase("thierry henry is the best football player of all time")
-    public shouldPassValueToValidationSystem(input: string) {
+    public async shouldPassValueToValidationSystem(input: string) {
         const value = getMockObservable<string>();
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
         // trigger the validation
         value(input);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
+    @AsyncTest()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
     public async shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
@@ -61,34 +76,127 @@ export class ValidationTests {
 
         this.validateSpy.andReturn(Promise.resolve(providedErrors));
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
         // trigger the validation
         value("bad!");
 
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
         Expect(errors()).toEqual(providedErrors);
     }
 
+    @AsyncTest()
     @TestCase(20)
     @TestCase(30)
-    public shouldValidateInitialValueOnBind(input: number) {
+    public async shouldValidateInitialValueOnBind(input: number) {
         const value = getMockObservable<number>(input);
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, undefined, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input, Any);
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
-    @TestCase({ sequential: true })
-    @TestCase({ sequential: false })
-    public shouldPassOptionsToValidator(options: any) {
-        const value = getMockObservable<number>();
+    @AsyncTest()
+    public async shouldDebounceValidationsIfTooSoon() {
+        const value = getMockObservable<number>(10);
         const errors = getMockObservable<Array<string>>();
 
-        bindValidation([ ], value, errors, options, validationSystem.validate);
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, Any, options);
+        // set value immediately and update immediately
+        value(20);
+        value(30);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        // first should not be hit due to debouncing
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+    }
+
+    @AsyncTest()
+    public async shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors);
+
+        // set value immediately and update after 151ms
+        value(20);
+
+        await wait(DEBOUNCE_WAIT_PERIOD); // wait until the debounce timeout
+
+        value(30);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        // both should be hit (spaced apart so no debounce)
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+    }
+
+    @AsyncTest()
+    public async shouldRevalidateForFirstDependentObservable() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const dependent = getMockObservable<number>(500);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ dependent ]);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        dependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+    }
+
+    @AsyncTest()
+    public async shouldRevalidateForSecondDependentObservable() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const firstDependent = getMockObservable<number>(500);
+        const secondDependent = getMockObservable<number>(800);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ firstDependent, secondDependent ]);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        secondDependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+    }
+
+    @AsyncTest()
+    public async shouldDebounceForDependentObservables() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const dependent = getMockObservable<number>(500);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ dependent ]);
+
+        dependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(1).times;
     }
 
 }
