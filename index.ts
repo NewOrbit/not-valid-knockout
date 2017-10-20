@@ -22,6 +22,11 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         return await validate(validators, value);
     };
 
+    const subscribeValidationToKnockoutObservable =
+        (observable: KnockoutObservable<any>, subject: Subject<any>) => {
+            observable.subscribe(() => subject.next());
+        };
+
     const bindValidation = <T>(
         validators: ValidationFunction<T>[],
         valueObservable: KnockoutObservable<T>,
@@ -31,13 +36,14 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
 
         const subject = new Subject();
 
-        subject.debounceTime(150)
-               .switchMap(() => getErrors(validators, valueObservable))
-               .subscribe((errors) => {
-                   errorObservable(errors);
-               });
+        subject
+            .debounceTime(150)
+            .switchMap(() => getErrors(validators, valueObservable))
+            .subscribe((errors) => {
+                errorObservable(errors);
+            });
 
-        valueObservable.subscribe(() => subject.next());
+        subscribeValidationToKnockoutObservable(valueObservable, subject);
     
         subject.next();
     };
