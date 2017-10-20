@@ -1,11 +1,11 @@
-/* tslint:disable:max-line-length */
+/* tslint:disable:max-line-length array-type */
 
 import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
 import { createKnockoutWrapper, ValidateFunction } from "./index";
 
 const validationSystem: { validate: ValidateFunction } = {
-    validate: async <T> (validators: Array<any>, value: T) => await []
+    validate: async <T> (validators: any[], value: T) => await []
 };
 
 const getMockObservable = <T>(value?: T) => mockObservable<T>(value).observable as KnockoutObservable<T>;
@@ -34,9 +34,9 @@ export class ValidationTests {
     @AsyncTest()
     @TestCase([ ])
     @TestCase([ () => "bad" ])
-    public async shouldPassValidatorsToValidationSystem(validators: Array<any>) {
+    public async shouldPassValidatorsToValidationSystem(validators: any[]) {
         const value = getMockObservable<string>();
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation(validators, value, errors);
@@ -54,7 +54,7 @@ export class ValidationTests {
     @TestCase("thierry henry is the best football player of all time")
     public async shouldPassValueToValidationSystem(input: string) {
         const value = getMockObservable<string>();
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
@@ -70,9 +70,9 @@ export class ValidationTests {
     @AsyncTest()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
-    public async shouldPassValidationErrorsToErrorObservable(providedErrors: Array<string>) {
+    public async shouldPassValidationErrorsToErrorObservable(providedErrors: string[]) {
         const value = getMockObservable<string>();
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         this.validateSpy.andReturn(Promise.resolve(providedErrors));
 
@@ -92,7 +92,7 @@ export class ValidationTests {
     @TestCase(30)
     public async shouldValidateInitialValueOnBind(input: number) {
         const value = getMockObservable<number>(input);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
@@ -105,7 +105,7 @@ export class ValidationTests {
     @AsyncTest()
     public async shouldDebounceValidationsIfTooSoon() {
         const value = getMockObservable<number>(10);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
@@ -124,7 +124,7 @@ export class ValidationTests {
     @AsyncTest()
     public async shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
         const value = getMockObservable<number>(10);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
@@ -146,7 +146,7 @@ export class ValidationTests {
     @AsyncTest()
     public async shouldRevalidateForFirstDependentObservable() {
         const value = getMockObservable<number>(10);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const dependent = getMockObservable<number>(500);
 
@@ -159,13 +159,13 @@ export class ValidationTests {
 
         await wait(DEBOUNCE_WAIT_PERIOD);
 
-        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2);
     }
 
     @AsyncTest()
     public async shouldRevalidateForSecondDependentObservable() {
         const value = getMockObservable<number>(10);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const firstDependent = getMockObservable<number>(500);
         const secondDependent = getMockObservable<number>(800);
@@ -179,13 +179,13 @@ export class ValidationTests {
 
         await wait(DEBOUNCE_WAIT_PERIOD);
 
-        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2);
     }
 
     @AsyncTest()
     public async shouldDebounceForDependentObservables() {
         const value = getMockObservable<number>(10);
-        const errors = getMockObservable<Array<string>>();
+        const errors = getMockObservable<string[]>();
 
         const dependent = getMockObservable<number>(500);
 
@@ -196,7 +196,7 @@ export class ValidationTests {
 
         await wait(DEBOUNCE_WAIT_PERIOD);
 
-        Expect(validationSystem.validate).toHaveBeenCalled().exactly(1).times;
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(1);
     }
 
 }

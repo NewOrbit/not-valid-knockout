@@ -1,6 +1,6 @@
 /// <reference types="knockout" />
 
-/* tslint:disable:interface-name callable-types max-line-length */
+/* tslint:disable:interface-name callable-types max-line-length array-type */
 
 import {
     validate as newOrbitValidate,
@@ -27,7 +27,7 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         };
 
         const subscribeValidationToKnockoutObservable =
-            (observable: KnockoutObservable<any>, subject: BehaviorSubject<any>) => {
+            (observable: KnockoutObservable<any>) => {
                 observable.subscribe(triggerValidation);
             };
 
@@ -39,10 +39,10 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
             .switchMap(async value => await validate(validators, value))
             .subscribe(errors => errorObservable(errors));
 
-        subscribeValidationToKnockoutObservable(valueObservable, subject);
+        subscribeValidationToKnockoutObservable(valueObservable);
 
         if (dependentObservables) {
-            dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o, subject));
+            dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o));
         }
     };
 
