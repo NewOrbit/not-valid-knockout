@@ -9,23 +9,10 @@ import {
     ValidationOptions
 } from "@neworbit/validation";
 
-import { Subject } from "rxjs";
+import { BehaviorSubject } from "rxjs";
 
 const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
-
-    const getErrors = async <T>(
-        validators: ValidationFunction<T>[],
-        valueObservable: KnockoutObservable<T>
-    ) => {
-        const value = valueObservable();
-        return await validate(validators, value);
-    };
-
-    const subscribeValidationToKnockoutObservable =
-        (observable: KnockoutObservable<any>, subject: Subject<any>) => {
-            observable.subscribe(() => subject.next());
-        };
 
     const bindValidation = <T>(
         validators: ValidationFunction<T>[],
@@ -34,22 +21,29 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         dependentObservables?: KnockoutObservable<any>[]
     ) => {
 
-        const subject = new Subject();
+        const triggerValidation = () => {
+            const value = valueObservable();
+            subject.next(value);
+        };
+
+        const subscribeValidationToKnockoutObservable =
+            (observable: KnockoutObservable<any>, subject: BehaviorSubject<any>) => {
+                observable.subscribe(triggerValidation);
+            };
+
+        const initialValue = valueObservable();
+        const subject = new BehaviorSubject<T>(initialValue);
 
         subject
             .debounceTime(150)
-            .switchMap(() => getErrors(validators, valueObservable))
-            .subscribe((errors) => {
-                errorObservable(errors);
-            });
+            .switchMap(async value => await validate(validators, value))
+            .subscribe(errors => errorObservable(errors));
 
         subscribeValidationToKnockoutObservable(valueObservable, subject);
 
         if (dependentObservables) {
             dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o, subject));
         }
-    
-        subject.next();
     };
 
     return {
