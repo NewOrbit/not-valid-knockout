@@ -1,6 +1,6 @@
 {
   "name": "@neworbit/validation-knockout",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "NewOrbit validation for knockout",
   "main": "index.js",
   "typings": "index.d.ts",
