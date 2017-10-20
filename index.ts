@@ -11,6 +11,8 @@ import {
 
 import { BehaviorSubject } from "rxjs";
 
+const DEBOUNCE_WAIT_PERIOD = 350;
+
 const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
 
@@ -35,7 +37,7 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         const subject = new BehaviorSubject<T>(initialValue);
 
         subject
-            .debounceTime(150)
+            .debounceTime(DEBOUNCE_WAIT_PERIOD)
             .switchMap(async value => await validate(validators, value))
             .subscribe(errors => errorObservable(errors));
 

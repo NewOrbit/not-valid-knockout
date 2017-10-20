@@ -1,6 +1,6 @@
 /* tslint:disable:max-line-length array-type */
 
-import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest } from "alsatian";
+import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest, Timeout } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
 import { createKnockoutWrapper, ValidateFunction } from "./index";
 
@@ -14,7 +14,7 @@ function wait(waitPeriodMilliseconds: number) {
     return new Promise(resolve => setTimeout(resolve, waitPeriodMilliseconds));
 }
 
-const DEBOUNCE_WAIT_PERIOD = 151;
+const DEBOUNCE_WAIT_PERIOD = 351;
 
 @TestFixture()
 export class ValidationTests {
@@ -102,6 +102,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
     }
 
+    @Timeout(1000)
     @AsyncTest()
     public async shouldDebounceValidationsIfTooSoon() {
         const value = getMockObservable<number>(10);
@@ -110,8 +111,11 @@ export class ValidationTests {
         const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
         bindValidation([ ], value, errors);
 
-        // set value immediately and update immediately
+        // set value immediately and update a short time after
         value(20);
+
+        await wait(200); // wait 200ms which is less than the debounce time
+
         value(30);
 
         await wait(DEBOUNCE_WAIT_PERIOD);
@@ -121,6 +125,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
     }
 
+    @Timeout(1000)
     @AsyncTest()
     public async shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
         const value = getMockObservable<number>(10);
@@ -143,6 +148,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
     }
 
+    @Timeout(1000)
     @AsyncTest()
     public async shouldRevalidateForFirstDependentObservable() {
         const value = getMockObservable<number>(10);
@@ -162,6 +168,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalled().exactly(2);
     }
 
+    @Timeout(1000)
     @AsyncTest()
     public async shouldRevalidateForSecondDependentObservable() {
         const value = getMockObservable<number>(10);
