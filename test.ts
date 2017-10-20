@@ -143,4 +143,43 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
     }
 
+    @AsyncTest()
+    public async shouldRevalidateForFirstDependentObservable() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const dependent = getMockObservable<number>(500);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ dependent ]);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        dependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+    }
+
+    @AsyncTest()
+    public async shouldRevalidateForSecondDependentObservable() {
+        const value = getMockObservable<number>(10);
+        const errors = getMockObservable<Array<string>>();
+
+        const firstDependent = getMockObservable<number>(500);
+        const secondDependent = getMockObservable<number>(800);
+
+        const bindValidation = createKnockoutWrapper(validationSystem.validate).bindValidation;
+        bindValidation([ ], value, errors, [ firstDependent, secondDependent ]);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        secondDependent(600);
+
+        await wait(DEBOUNCE_WAIT_PERIOD);
+
+        Expect(validationSystem.validate).toHaveBeenCalled().exactly(2).times;
+    }
+
 }

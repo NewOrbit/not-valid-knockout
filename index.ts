@@ -44,6 +44,10 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
             });
 
         subscribeValidationToKnockoutObservable(valueObservable, subject);
+
+        if (dependentObservables) {
+            dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o, subject));
+        }
     
         subject.next();
     };
