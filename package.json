@@ -36,8 +36,8 @@
   },
   "devDependencies": {
     "@neworbit/knockout-test-utils": "0.0.2",
-    "@neworbit/tslint-config": "0.0.5",
     "alsatian": "^1.3.1",
+    "neworbit-tslint-config": "^2.0.0",
     "tslint": "^5.2.0",
     "typescript": "^2.2.2"
   }
