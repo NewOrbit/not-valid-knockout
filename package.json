@@ -30,7 +30,7 @@
   },
   "homepage": "https://github.com/NewOrbit/not-valid-knockout#readme",
   "dependencies": {
-    "@neworbit/validation": "2.0.0",
+    "not-valid": "1.1.2",
     "@types/knockout": "^3.4.40",
     "@types/node": "^8.0.0",
     "rxjs": "^5.5.0"
