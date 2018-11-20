@@ -19,7 +19,7 @@
     "validation",
     "knockout"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "author": "NewOrbit Ltd",
   "repository": {
     "type": "git",

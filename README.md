@@ -22,3 +22,7 @@ bindValidation<string>(
     nameErrors
 );
 ```
+
+## License
+
+Made with :sparkling_heart: by [NewOrbit](https://www.neworbit.co.uk/) in Oxfordshire, and licensed under the [MIT License](LICENSE)
