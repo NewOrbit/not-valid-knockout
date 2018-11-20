@@ -1,12 +1,12 @@
-# @neworbit/validation-knockout
+# not-valid-knockout
 
-Interface between knockout and [@neworbit/validation](https://github.com/NewOrbit/validation/).
+Interface between knockout and [not-valid](https://github.com/NewOrbit/not-valid/).
 
 ## Usage
 
 ```typescript
-import { createValidator } from 
-import { createKnockoutWrapper } from "@neworbit/validation-knockout";
+import { createValidator } from "not-valid";
+import { createKnockoutWrapper } from "not-valid-knockout";
 
 const mustBeJames = createValidator<string>(v => v === "James", "Value must be 'James'");
 
