@@ -7,7 +7,7 @@ import {
     ValidationFunction,
     ValidateFunction,
     ValidationOptions
-} from "@neworbit/validation";
+} from "not-valid";
 
 import { BehaviorSubject } from "rxjs";
 

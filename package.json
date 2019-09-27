@@ -1,11 +1,11 @@
 {
-  "name": "@neworbit/validation-knockout",
-  "version": "3.0.2",
-  "description": "NewOrbit validation for knockout",
+  "name": "not-valid-knockout",
+  "version": "1.0.0",
+  "description": "Interface between not-valid and knockout",
   "main": "index.js",
   "typings": "index.d.ts",
   "scripts": {
-    "prepublish": "npm run review && npm run build",
+    "prepublishOnly": "npm run review && npm run build",
     "build": "tsc",
     "lint": "tslint -c tslint.json index.ts test.ts",
     "test": "npm run build && alsatian test.js",
@@ -19,18 +19,18 @@
     "validation",
     "knockout"
   ],
-  "license": "ISC",
+  "license": "MIT",
   "author": "NewOrbit Ltd",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NewOrbit/NewOrbit.validation-knockout.git"
+    "url": "git+https://github.com/NewOrbit/not-valid-knockout.git"
   },
   "bugs": {
-    "url": "https://github.com/NewOrbit/NewOrbit.validation-knockout/issues"
+    "url": "https://github.com/NewOrbit/not-valid-knockout/issues"
   },
-  "homepage": "https://github.com/NewOrbit/NewOrbit.validation-knockout#readme",
+  "homepage": "https://github.com/NewOrbit/not-valid-knockout#readme",
   "dependencies": {
-    "@neworbit/validation": "2.0.0",
+    "not-valid": "1.1.2",
     "@types/knockout": "^3.4.40",
     "@types/node": "^8.0.0",
     "rxjs": "^5.5.0"
