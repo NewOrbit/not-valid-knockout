@@ -15,6 +15,7 @@ steps:
   inputs:
     workingDir: ./
     verbose: false
+    customCommand: 'ci'
 
 - task: Npm@1
   displayName: 'npm run lint'
