@@ -9,7 +9,7 @@
     "build": "tsc",
     "lint": "tslint -c tslint.json index.ts test.ts",
     "test": "npm run build && alsatian test.js",
-    "test:ci": "npm run build:test && alsatian test.js --tap | tap-xunit > ./test-results.xml",
+    "test:ci": "npm run build && alsatian test.js --tap | tap-xunit > ./test-results.xml",
     "review": "npm run test && npm run lint"
   },
   "files": [
