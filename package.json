@@ -1,6 +1,6 @@
 {
   "name": "not-valid-knockout",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Interface between not-valid and knockout",
   "main": "index.js",
   "typings": "index.d.ts",
