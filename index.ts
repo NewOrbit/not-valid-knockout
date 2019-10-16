@@ -9,7 +9,7 @@ import {
     ValidationOptions
 } from "not-valid";
 
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable } from "rxjs";
 
 const DEBOUNCE_WAIT_PERIOD = 350;
 
@@ -21,7 +21,7 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         valueObservable: KnockoutObservable<T>,
         errorObservable: KnockoutObservable<string[]>,
         dependentObservables?: KnockoutObservable<any>[]
-    ) => {
+    ): Observable<string[]> => {
 
         const triggerValidation = () => {
             const value = valueObservable();
@@ -36,16 +36,19 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         const initialValue = valueObservable();
         const subject = new BehaviorSubject<T>(initialValue);
 
-        subject
+        const resultObservable = subject
             .debounceTime(DEBOUNCE_WAIT_PERIOD)
-            .switchMap(async value => await validate(validators, value))
-            .subscribe(errors => errorObservable(errors));
+            .switchMap(async value => await validate(validators, value));
+
+        resultObservable.subscribe(errors => errorObservable(errors));
 
         subscribeValidationToKnockoutObservable(valueObservable);
 
         if (dependentObservables) {
             dependentObservables.forEach(o => subscribeValidationToKnockoutObservable(o));
         }
+
+        return resultObservable;
     };
 
     return {
