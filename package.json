@@ -9,6 +9,7 @@
     "build": "tsc",
     "lint": "tslint -c tslint.json index.ts test.ts",
     "test": "npm run build && alsatian test.js",
+    "test:ci": "npm run build:test && alsatian test.js --tap | tap-xunit > ./test-results.xml",
     "review": "npm run test && npm run lint"
   },
   "files": [
@@ -39,6 +40,7 @@
     "@neworbit/knockout-test-utils": "0.0.2",
     "alsatian": "^1.3.1",
     "neworbit-tslint-config": "^2.0.0",
+    "tap-xunit": "^2.2.0",
     "tslint": "^5.2.0",
     "typescript": "^2.2.2"
   }
