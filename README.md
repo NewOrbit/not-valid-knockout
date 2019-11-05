@@ -23,6 +23,10 @@ bindValidation<string>(
 );
 ```
 
+## Testing
+
+If you need to reduce the debounce time for testing you can set the environment variable `NOT_VALID_KNOCKOUT_DEBOUNCE`.
+
 ## License
 
 Made with :sparkling_heart: by [NewOrbit](https://www.neworbit.co.uk/) in Oxfordshire, and licensed under the [MIT License](LICENSE)
