@@ -5,13 +5,14 @@
 import {
     validate as newOrbitValidate,
     ValidationFunction,
-    ValidateFunction,
-    ValidationOptions
+    ValidateFunction
 } from "not-valid";
 
 import { BehaviorSubject, Observable } from "rxjs";
 
-const DEBOUNCE_WAIT_PERIOD = 350;
+const DEBOUNCE_WAIT_PERIOD = process.env.NOT_VALID_KNOCKOUT_DEBOUNCE !== undefined
+    ? +process.env.NOT_VALID_KNOCKOUT_DEBOUNCE
+    : 350;
 
 const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
     const validate = validationSystem || newOrbitValidate;
