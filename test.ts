@@ -1,8 +1,9 @@
 /* tslint:disable:max-line-length array-type */
 
-import { TestFixture, Test, TestCase, Expect, SpyOn, Setup, Teardown, FunctionSpy, Any, AsyncTest, FocusTest, Timeout } from "alsatian";
+import { TestFixture, TestCase, Expect, SpyOn, Setup, Teardown, Any, AsyncTest, Timeout, Test } from "alsatian";
 import { mockObservable } from "@neworbit/knockout-test-utils";
 import { createKnockoutWrapper, ValidateFunction } from "./index";
+import { ValidationFunction } from "not-valid";
 
 const validationSystem: { validate: ValidateFunction } = {
     validate: async <T> (validators: any[], value: T) => await []
@@ -31,7 +32,7 @@ export class ValidationTests {
         this.validateSpy.restore();
     }
 
-    @AsyncTest()
+    @Test()
     @TestCase([ ])
     @TestCase([ () => "bad" ])
     public async shouldPassValidatorsToValidationSystem(validators: any[]) {
@@ -49,7 +50,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalledWith(validators, Any);
     }
 
-    @AsyncTest()
+    @Test()
     @TestCase("some value")
     @TestCase("thierry henry is the best football player of all time")
     public async shouldPassValueToValidationSystem(input: string) {
@@ -64,10 +65,10 @@ export class ValidationTests {
 
         await wait(DEBOUNCE_WAIT_PERIOD);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), input);
     }
 
-    @AsyncTest()
+    @Test()
     @TestCase([ "green error", "blue error" ])
     @TestCase([ "biscuits and cake a happy man doth make" ])
     public async shouldPassValidationErrorsToErrorObservable(providedErrors: string[]) {
@@ -87,7 +88,7 @@ export class ValidationTests {
         Expect(errors()).toEqual(providedErrors);
     }
 
-    @AsyncTest()
+    @Test()
     @TestCase(20)
     @TestCase(30)
     public async shouldValidateInitialValueOnBind(input: number) {
@@ -99,7 +100,7 @@ export class ValidationTests {
 
         await wait(DEBOUNCE_WAIT_PERIOD);
 
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, input);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), input);
     }
 
     @Timeout(1000)
@@ -121,12 +122,12 @@ export class ValidationTests {
         await wait(DEBOUNCE_WAIT_PERIOD);
 
         // first should not be hit due to debouncing
-        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any, 20);
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+        Expect(validationSystem.validate).not.toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), 30);
     }
 
     @Timeout(1000)
-    @AsyncTest()
+    @Test()
     public async shouldNotDebounceValidationsAfterTwoHundredMilliseconds() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<string[]>();
@@ -144,12 +145,12 @@ export class ValidationTests {
         await wait(DEBOUNCE_WAIT_PERIOD);
 
         // both should be hit (spaced apart so no debounce)
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 20);
-        Expect(validationSystem.validate).toHaveBeenCalledWith(Any, 30);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), 20);
+        Expect(validationSystem.validate).toHaveBeenCalledWith(Any<Array<ValidationFunction<any>>>(Array), 30);
     }
 
     @Timeout(1000)
-    @AsyncTest()
+    @Test()
     public async shouldRevalidateForFirstDependentObservable() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<string[]>();
@@ -169,7 +170,7 @@ export class ValidationTests {
     }
 
     @Timeout(1000)
-    @AsyncTest()
+    @Test()
     public async shouldRevalidateForSecondDependentObservable() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<string[]>();
@@ -189,7 +190,7 @@ export class ValidationTests {
         Expect(validationSystem.validate).toHaveBeenCalled().exactly(2);
     }
 
-    @AsyncTest()
+    @Test()
     public async shouldDebounceForDependentObservables() {
         const value = getMockObservable<number>(10);
         const errors = getMockObservable<string[]>();
