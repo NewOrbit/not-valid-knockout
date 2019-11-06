@@ -44,6 +44,6 @@
     "neworbit-tslint-config": "^2.0.0",
     "tap-xunit": "^2.2.0",
     "tslint": "^5.2.0",
-    "typescript": "^2.2.2"
+    "typescript": "^3.7.2"
   }
 }
