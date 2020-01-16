@@ -9,6 +9,7 @@ import {
 } from "not-valid";
 
 import { BehaviorSubject, Observable } from "rxjs";
+import { debounceTime, switchMap } from "rxjs/operators";
 
 const DEBOUNCE_WAIT_PERIOD = process.env.NOT_VALID_KNOCKOUT_DEBOUNCE !== undefined
     ? +process.env.NOT_VALID_KNOCKOUT_DEBOUNCE
@@ -38,8 +39,10 @@ const createKnockoutWrapper = (validationSystem?: ValidateFunction) => {
         const subject = new BehaviorSubject<T>(initialValue);
 
         const resultObservable = subject
-            .debounceTime(DEBOUNCE_WAIT_PERIOD)
-            .switchMap(async value => await validate(validators, value));
+            .pipe(
+                debounceTime(DEBOUNCE_WAIT_PERIOD),
+                switchMap(async value => await validate(validators, value))
+            );
 
         resultObservable.subscribe(errors => errorObservable(errors));
 

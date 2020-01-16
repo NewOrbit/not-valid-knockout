@@ -32,18 +32,21 @@
   },
   "homepage": "https://github.com/NewOrbit/not-valid-knockout#readme",
   "dependencies": {
-    "not-valid": "2.0.0",
-    "@types/knockout": "^3.4.40",
-    "@types/node": "^12.12.8",
-    "rxjs": "^5.5.0"
+    "not-valid": "2.0.0"
   },
   "devDependencies": {
+    "@types/node": "^12.12.8",
+    "@types/knockout": "^3.4.40",
     "@neworbit/knockout-test-utils": "0.0.2",
     "alsatian": "^3.1.0",
     "chalk": "^2.4.2",
     "neworbit-tslint-config": "^2.0.0",
+    "rxjs": "^6.5.4",
     "tap-xunit": "^2.2.0",
     "tslint": "^5.2.0",
     "typescript": "^3.7.2"
+  },
+  "peerDependencies": {
+    "rxjs": "6.x"
   }
 }
