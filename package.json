@@ -43,7 +43,7 @@
     "neworbit-tslint-config": "^2.0.0",
     "rxjs": "^6.5.4",
     "tap-xunit": "^2.2.0",
-    "tslint": "^5.2.0",
+    "tslint": "^6.0.0",
     "typescript": "^3.7.2"
   },
   "peerDependencies": {
