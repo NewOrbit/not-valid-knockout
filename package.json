@@ -35,7 +35,7 @@
     "not-valid": "2.0.0"
   },
   "devDependencies": {
-    "@types/node": "^12.12.8",
+    "@types/node": "^16.3.2",
     "@types/knockout": "^3.4.40",
     "@neworbit/knockout-test-utils": "0.0.2",
     "alsatian": "^3.1.0",
