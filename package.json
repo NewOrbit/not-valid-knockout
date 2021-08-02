@@ -39,7 +39,7 @@
     "@types/knockout": "^3.4.40",
     "@neworbit/knockout-test-utils": "0.0.2",
     "alsatian": "^3.1.0",
-    "chalk": "^2.4.2",
+    "chalk": "^4.1.2",
     "neworbit-tslint-config": "^2.0.0",
     "rxjs": "^6.5.4",
     "tap-xunit": "^2.2.0",
